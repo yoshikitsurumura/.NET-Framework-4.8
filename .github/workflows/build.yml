@@ -1,0 +1,30 @@
+name: build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build (Release)
+        run: msbuild TaskManager.sln /t:Build /p:Configuration=Release /v:minimal /nologo
+
+      - name: Run tests
+        run: .\tests\TaskManager.Tests\bin\Release\TaskManager.Tests.exe
+
+      - name: Upload application
+        uses: actions/upload-artifact@v4
+        with:
+          name: TaskManager
+          path: src/TaskManager.App/bin/Release/

@@ -1,0 +1,22 @@
+## ビルド出力
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userprefs
+
+## Visual Studio
+.vs/
+*.VC.db
+*.psess
+*.vsp
+*.vspx
+
+## ReSharper / Rider
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+## その他
+*.log
+*.tmp
