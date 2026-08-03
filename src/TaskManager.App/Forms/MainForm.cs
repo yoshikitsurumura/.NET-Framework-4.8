@@ -148,7 +148,13 @@ namespace TaskManager.App.Forms
                 _suppressEvents = false;
             }
 
-            RefreshCategoryFilter();
+            // 絞り込みに使っていたカテゴリが無くなった場合は選択が変わるので、一覧を作り直す。
+            if (RefreshCategoryFilter())
+            {
+                RefreshList(idsToSelect);
+                return;
+            }
+
             UpdateStatusBar(items.Count);
             UpdateButtonState();
         }
@@ -227,7 +233,11 @@ namespace TaskManager.App.Forms
             return single.Length > 80 ? single.Substring(0, 80) + "..." : single;
         }
 
-        private void RefreshCategoryFilter()
+        /// <summary>
+        /// カテゴリ絞り込みの選択肢を最新の内容に更新する。
+        /// 選択されていたカテゴリが無くなった場合は「(すべて)」に戻し、true を返す。
+        /// </summary>
+        private bool RefreshCategoryFilter()
         {
             string current = categoryFilterComboBox.SelectedItem as string;
             IList<string> categories = _service.GetCategories();
@@ -238,7 +248,7 @@ namespace TaskManager.App.Forms
             var existing = categoryFilterComboBox.Items.Cast<string>().ToList();
             if (existing.SequenceEqual(desired))
             {
-                return;
+                return false;
             }
 
             bool previous = _suppressEvents;
@@ -258,6 +268,9 @@ namespace TaskManager.App.Forms
             {
                 _suppressEvents = previous;
             }
+
+            // 選択していたカテゴリが一覧から消えた場合だけ true。
+            return current != null && current != AllCategories && !desired.Contains(current);
         }
 
         private void UpdateStatusBar(int shownCount)

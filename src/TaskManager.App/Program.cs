@@ -9,19 +9,9 @@ namespace TaskManager.App
         [STAThread]
         private static void Main()
         {
+            // 高 DPI 対応は app.manifest の dpiAwareness 設定で行っている。
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            // 高 DPI 対応 (.NET Framework 4.8 で追加された API)。
-            // 古い OS などで利用できない場合は既定の動作のまま続行する。
-            try
-            {
-                Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            }
-            catch (Exception)
-            {
-                // 無視して既定の DPI モードで起動する。
-            }
 
             Application.ThreadException += (sender, e) => ShowUnexpectedError(e.Exception);
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => ShowUnexpectedError(e.ExceptionObject as Exception);
