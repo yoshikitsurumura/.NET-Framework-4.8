@@ -51,28 +51,53 @@ TaskManager.sln
 UI とロジックを分けているため、`TaskManager.Core` はテストから直接呼び出せます。
 テストは NuGet パッケージを使わない自前のランナーで、成功なら終了コード 0、失敗があれば 1 を返します。
 
-## ビルドと実行
+## 動かし方
 
-### 必要なもの
+**Windows デスクトップアプリなので、動かすには Windows PC が必要です。**
+macOS / Linux では動きません (Windows 仮想マシンが必要です)。
+
+### 方法 1: ビルド済みファイルをダウンロードして起動する (一番簡単)
+
+開発環境を入れなくても、CI がビルドした実行ファイルをそのまま使えます。
+
+1. GitHub のリポジトリページ → **Actions** タブ → 一番上の緑チェックの `build` 実行を開く
+2. ページ下部の **Artifacts** にある **TaskManager** をクリックして zip をダウンロード
+3. zip を右クリック →「すべて展開」で展開する
+4. 中の **TaskManager.exe** をダブルクリック
+
+必要なもの: Windows 10 (1903 以降) または Windows 11。.NET Framework 4.8 は OS に標準で入っているため、
+別途インストールは不要です。それ以前の Windows の場合のみ
+[.NET Framework 4.8 ランタイム](https://dotnet.microsoft.com/download/dotnet-framework/net48) を入れてください。
+
+> ダウンロードした exe は「WindowsによってPCが保護されました」と警告される場合があります。
+> その場合は「詳細情報」→「実行」を選ぶか、zip のプロパティで「許可する」にチェックを入れてから展開してください。
+> Artifacts は既定で 90 日で消えるため、古い実行分では表示されないことがあります。
+
+### 方法 2: 自分でビルドして起動する
+
+必要なもの:
 
 - Windows
 - .NET Framework 4.8 Developer Pack
 - Visual Studio 2019/2022、または Build Tools for Visual Studio (MSBuild)
 
-### コマンドラインから
+リポジトリを clone したフォルダーで、コマンドプロンプトから実行します。
 
 ```cmd
-build.cmd            :: Release でビルドしてテストまで実行
+run.cmd              :: ビルド → テスト → アプリ起動 まで一気に行う
+run.cmd Debug        :: Debug 構成でビルドして起動
+
+build.cmd            :: ビルドとテストのみ (アプリは起動しない)
 build.cmd Debug      :: Debug でビルド
 ```
 
-ビルドが通ると、実行ファイルは次の場所に出力されます。
+ビルドが通ると、実行ファイルは次の場所に出力されます。以降はこの exe を直接ダブルクリックするだけで起動できます。
 
 ```
 src\TaskManager.App\bin\Release\TaskManager.exe
 ```
 
-### Visual Studio から
+### 方法 3: Visual Studio から
 
 `TaskManager.sln` を開き、`TaskManager.App` をスタートアッププロジェクトに設定して実行 (F5) してください。
 
@@ -82,7 +107,11 @@ src\TaskManager.App\bin\Release\TaskManager.exe
 tests\TaskManager.Tests\bin\Release\TaskManager.Tests.exe
 ```
 
-## CI
+成功なら終了コード 0、失敗があれば 1 を返します。
 
-`.github/workflows/build.yml` で、push / pull request のたびに windows-latest 上で
-MSBuild によるビルドとテスト実行を行い、ビルド成果物をアーティファクトとして保存します。
+## CI (GitHub Actions)
+
+`.github/workflows/build.yml` は **アプリをホスティングするものではありません**。
+push / pull request のたびに windows-latest 上で MSBuild によるビルドとテスト実行を行い、
+壊れていないことを確認したうえで、ビルド成果物をアーティファクトとして保存するだけです。
+アプリ自体は各自の Windows PC で起動します。
